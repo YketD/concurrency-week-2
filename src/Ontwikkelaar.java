@@ -23,6 +23,21 @@ public class Ontwikkelaar extends Thread {
 
     }
     private void meldBeschikbaar(){
+        try {
+            if (OntwikkelBedrijf.ontwikkelaarsInMeeting < 3) {
+                OntwikkelBedrijf.ontwikkelaarsInMeeting += 1;
+                OntwikkelBedrijf.readyForMeeting.acquire();
+                if (OntwikkelBedrijf.userMeeting && OntwikkelBedrijf.amtInMeeting == 0){
+                    OntwikkelBedrijf.amtInMeeting += 1;
+                    OntwikkelBedrijf.meeting.acquire();
+                }   else if (!OntwikkelBedrijf.userMeeting){
+                    OntwikkelBedrijf.meeting.acquire();
+                }
 
+
+            }
+        }   catch(InterruptedException ie){
+
+        }
     }
 }

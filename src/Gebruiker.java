@@ -7,20 +7,44 @@ public class Gebruiker extends Thread {
         while(true) {
             gebruiken();
             meldProbleem();
+            getInvitation();
+            driveToCompany();
+            startMeeting();
         }
     }
 
     private void gebruiken() {
         try {
             System.out.println("gebruiker gebruikt app..");
-            Thread.sleep(10000);
+            Thread.sleep(5000);
         } catch (InterruptedException ie) {
         }
     }
 
     public void meldProbleem(){
+        OntwikkelBedrijf.probleem.release();
+    }
+    public void getInvitation(){
         try {
-            OntwikkelBedrijf.probleem.release();
-        }   catch (InterruptedException ie){}
+            OntwikkelBedrijf.meetingInvitation.acquire();
+            System.out.println("meeting invitation acquired");
+        } catch (InterruptedException ie){}
+    }
+
+    public void driveToCompany(){
+        try {
+            Thread.sleep(1000);
+            OntwikkelBedrijf.arrivedAtCompany.release();
+        } catch (InterruptedException ie){
+
+        }
+    }
+
+    public void startMeeting(){
+        try {
+            System.out.println("user getting into meeting");
+            OntwikkelBedrijf.readyForUserMeeting.acquire();
+            System.out.println("user in meeting");
+        } catch (InterruptedException ie){}
     }
 }
