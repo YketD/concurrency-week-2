@@ -1,3 +1,5 @@
+import sun.awt.windows.ThemeReader;
+
 /**
  * Created by yketd on 14-9-2016.
  */
@@ -10,24 +12,51 @@ public class ProjectLeider extends Thread {
     }
     public void run(){
         while (true){
-            try{
-                if (OntwikkelBedrijf.ontwikkelaarsInMeeting == 3){
-                    System.out.println("start meeting");
-                    OntwikkelBedrijf.readyForMeeting.release();
-//                if(OntwikkelBedrijf.probleem.tryAcquire()){
-//                    System.out.println("probleem acquired.");
-//                    System.out.println("sending meeting invitation...");
-//                    OntwikkelBedrijf.meetingInvitation.release();
-//                    System.out.println("meeting acquired by user");
-//                };
-//                if (OntwikkelBedrijf.arrivedAtCompany.tryAcquire()){
-//                    System.out.println("user arrived at company, getting ready for meeting..");
-//                    Thread.sleep(2000);
-//                    System.out.println("meeting prepared, starting meeting");
-//                    OntwikkelBedrijf.readyForUserMeeting.release();
+            nap();
+        }
+    }
 
+    public void nap(){
+            try{
+                System.out.println("snoozing ...");
+                Thread.sleep(10000);
+            } catch (InterruptedException ie){
+                System.out.println("main thread interupted, leader woken up, checking the situation:");
+
+                if (OntwikkelBedrijf.probleem.tryAcquire()) {
+                    try {
+                        OntwikkelBedrijf.probleem.acquire();
+                        OntwikkelBedrijf.meetingInvitation.release();
+                        OntwikkelBedrijf.arrivedAtCompany.acquire();
+                        if (OntwikkelBedrijf.ontwikkelaarsInMeeting > 0) {
+                            OntwikkelBedrijf.devInvitation.release();
+                        }
+                        else{
+                            OntwikkelBedrijf.devInvitation.release(3);
+                            haveMeeting();
+                        }
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }   else if (OntwikkelBedrijf.ontwikkelaarsInMeeting == 3){
+                    System.out.println("devs are ready, sending 3 invites");
+                    OntwikkelBedrijf.devInvitation.release(3);
+                    haveMeeting();
                 }
-            } catch (Exception ie){}
+
+            }
+        }
+
+
+    private void haveMeeting(){
+        try {
+            OntwikkelBedrijf.leiderInOverleg = true;
+            Thread.sleep(10000);
+            System.out.println("meeting finished succesfully");
+            OntwikkelBedrijf.leiderInOverleg = false;
+            OntwikkelBedrijf.ontwikkelaarsInMeeting = 0;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 }

@@ -1,3 +1,4 @@
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
 
 /**
@@ -5,28 +6,40 @@ import java.util.concurrent.Semaphore;
  */
 public class OntwikkelBedrijf {
     private static int NUMBER_OF_ONTWIKKELAARS = 6;
-    private static int NUMBER_OF_GEBRUIKERS = 1;
+    private static int NUMBER_OF_GEBRUIKERS = 10;
     public static Semaphore readyForMeeting;
-    public  static Semaphore probleem;
+    public static Semaphore probleem;
     public static Semaphore meetingInvitation;
     public static Semaphore arrivedAtCompany;
     public static Semaphore readyForUserMeeting;
-    public static Semaphore devMeeting;
+    public static Semaphore increaseDevsWaiting;
     public static Semaphore meeting;
+    public static Semaphore devInvitation;
     private Ontwikkelaar[] ontwikkelaars;
     private Gebruiker[] gebruikers;
     public static int ontwikkelaarsInMeeting = 0;
     public static boolean userMeeting;
+    public static boolean leiderInOverleg = false;
     public static int amtInMeeting;
+
+    static ProjectLeider projectLeider = new ProjectLeider("jaap");
+
+    public static CountDownLatch devMeeting;
 
 
     public OntwikkelBedrijf(){
+        /* semaphore's voor gebruikers*/
         probleem = new Semaphore(0, true);
         meetingInvitation = new Semaphore(0,true);
         arrivedAtCompany = new Semaphore(0,true);
         readyForUserMeeting = new Semaphore(1, true);
+        devInvitation = new Semaphore(0, true);
+
+
         readyForMeeting = new Semaphore(0, true);
-        devMeeting = new Semaphore(0, true);
+        increaseDevsWaiting = new Semaphore(1,true);
+
+        devMeeting  = new CountDownLatch(4);
 
         ontwikkelaars = new Ontwikkelaar[NUMBER_OF_ONTWIKKELAARS];
         for (int i = 0; i < NUMBER_OF_ONTWIKKELAARS; i++){
@@ -40,7 +53,7 @@ public class OntwikkelBedrijf {
             gebruikers[i].start();
         }
 
-        ProjectLeider projectLeider = new ProjectLeider("jaap");
+
         projectLeider.start();
     }
 
