@@ -48,7 +48,7 @@ public class OntwikkelBedrijf {
         readyForMeeting = new Semaphore(0, true);
         increaseDevsWaiting = new Semaphore(1,true);
 
-        devMeeting  = new CountDownLatch(4);
+        devMeeting  = new CountDownLatch(3);
 
         ontwikkelaars = new Ontwikkelaar[NUMBER_OF_ONTWIKKELAARS];
         for (int i = 0; i < NUMBER_OF_ONTWIKKELAARS; i++){
@@ -72,6 +72,9 @@ public class OntwikkelBedrijf {
         return (long) (Math.random() * time);
     }
 
+    public static void countdownReset(){
+        devMeeting = new CountDownLatch(3);
+    }
     public static Ontwikkelaar[] getOntwikkelaars() {
         return ontwikkelaars;
     }

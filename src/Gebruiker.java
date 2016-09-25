@@ -17,7 +17,7 @@ public class Gebruiker extends Thread {
     private void gebruiken() {
         try {
 //            System.out.println("gebruiker gebruikt app..");
-            Thread.sleep(OntwikkelBedrijf.getRandomTime(100000));
+            Thread.sleep(OntwikkelBedrijf.getRandomTime(200000));
         } catch (InterruptedException ie) {
         }
     }

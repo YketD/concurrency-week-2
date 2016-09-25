@@ -18,7 +18,9 @@ public class ProjectLeider extends Thread {
             try {
                 OntwikkelBedrijf.devMeeting.await();
                 OntwikkelBedrijf.devInvitation.release(3);
+                OntwikkelBedrijf.projectLeidersTijd.acquire();
                 haveDevMeeting();
+                OntwikkelBedrijf.projectLeidersTijd.release();
             }   catch (InterruptedException ie){
                 System.out.println("main thread interupted, leader woken up, checking the situation:");
 
@@ -48,7 +50,8 @@ public class ProjectLeider extends Thread {
     private void haveUserMeeting(){
         try {
             OntwikkelBedrijf.leiderInOverleg = true;
-            System.out.println("initializing meeting, releasing other dev's");
+            System.out.println("initializing user meeting, releasing other dev's");
+            OntwikkelBedrijf.countdownReset();
             stopWaitingThreads(OntwikkelBedrijf.getOntwikkelaars());
             OntwikkelBedrijf.amtOfUsersArrived = 0;
             Thread.sleep(10000);
@@ -69,6 +72,7 @@ public class ProjectLeider extends Thread {
             OntwikkelBedrijf.leiderInOverleg = false;
             OntwikkelBedrijf.ontwikkelaarsInMeeting = 0;
             OntwikkelBedrijf.amtOfUsersArrived = 0;
+            OntwikkelBedrijf.countdownReset();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
