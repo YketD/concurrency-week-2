@@ -43,12 +43,14 @@ public class Gebruiker extends Thread {
         try {
             System.out.println("driving to company..");
             Thread.sleep(1000);
+
+            OntwikkelBedrijf.projectLeidersTijd.acquire();
             System.out.println("im here!");
             OntwikkelBedrijf.increaseUsersArrived.acquire();
             OntwikkelBedrijf.amtOfUsersArrived +=1;
             OntwikkelBedrijf.increaseUsersArrived.release();
             OntwikkelBedrijf.arrivedAtCompany.release();
-            OntwikkelBedrijf.projectLeidersTijd.acquire();
+
             OntwikkelBedrijf.projectLeider.interrupt();
 
         } catch (InterruptedException ie){

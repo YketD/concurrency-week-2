@@ -15,7 +15,7 @@ public class ProjectLeider extends Thread {
             try {
                 OntwikkelBedrijf.devMeeting.await();
                 OntwikkelBedrijf.devInvitation.release(3);
-                haveMeeting();
+                haveDevMeeting();
             }   catch (InterruptedException ie){
                 System.out.println("main thread interupted, leader woken up, checking the situation:");
 
@@ -26,7 +26,7 @@ public class ProjectLeider extends Thread {
                         }
                         OntwikkelBedrijf.devInvitation.release();
                         OntwikkelBedrijf.meetingInvitation.release(OntwikkelBedrijf.amtOfUsersArrived);
-                        haveMeeting();
+                        haveUserMeeting();
                     }   catch (InterruptedException i){
                         i.printStackTrace();
                     }
@@ -41,7 +41,21 @@ public class ProjectLeider extends Thread {
     }
 
 
-    private void haveMeeting(){
+    private void haveUserMeeting(){
+        try {
+            OntwikkelBedrijf.leiderInOverleg = true;
+            System.out.println("initializing meeting");
+            OntwikkelBedrijf.amtOfUsersArrived = 0;
+            Thread.sleep(10000);
+            System.out.println("meeting finished succesfully");
+            OntwikkelBedrijf.leiderInOverleg = false;
+            OntwikkelBedrijf.ontwikkelaarsInMeeting = 0;
+            OntwikkelBedrijf.amtOfUsersArrived = 0;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+    private void haveDevMeeting(){
         try {
             OntwikkelBedrijf.leiderInOverleg = true;
             System.out.println("initializing meeting");
@@ -49,6 +63,7 @@ public class ProjectLeider extends Thread {
             System.out.println("meeting finished succesfully");
             OntwikkelBedrijf.leiderInOverleg = false;
             OntwikkelBedrijf.ontwikkelaarsInMeeting = 0;
+            OntwikkelBedrijf.amtOfUsersArrived = 0;
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
