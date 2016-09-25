@@ -1,4 +1,7 @@
 import sun.awt.windows.ThemeReader;
+import sun.plugin.javascript.navig.Array;
+
+import java.util.ArrayList;
 
 /**
  * Created by yketd on 14-9-2016.
@@ -22,6 +25,7 @@ public class ProjectLeider extends Thread {
                 if (OntwikkelBedrijf.arrivedAtCompany.tryAcquire()){
                     try{
                         if (OntwikkelBedrijf.ontwikkelaarsInMeeting < 1){
+                            System.out.println("wachten op dev");
                             OntwikkelBedrijf.readyForUserMeeting.acquire();
                         }
                         OntwikkelBedrijf.devInvitation.release();
@@ -44,7 +48,8 @@ public class ProjectLeider extends Thread {
     private void haveUserMeeting(){
         try {
             OntwikkelBedrijf.leiderInOverleg = true;
-            System.out.println("initializing meeting");
+            System.out.println("initializing meeting, releasing other dev's");
+            stopWaitingThreads(OntwikkelBedrijf.getOntwikkelaars());
             OntwikkelBedrijf.amtOfUsersArrived = 0;
             Thread.sleep(10000);
             System.out.println("meeting finished succesfully");
@@ -66,6 +71,12 @@ public class ProjectLeider extends Thread {
             OntwikkelBedrijf.amtOfUsersArrived = 0;
         } catch (InterruptedException e) {
             e.printStackTrace();
+        }
+    }
+    public void stopWaitingThreads(Ontwikkelaar[] ontwikkelaars){
+        for (Ontwikkelaar ow : ontwikkelaars){
+            if (ow.isWaiting())
+                ow.interrupt();
         }
     }
 }

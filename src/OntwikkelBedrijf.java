@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
 
@@ -17,10 +18,11 @@ public class OntwikkelBedrijf {
     public static Semaphore increaseUsersArrived;
     public static Semaphore devInvitation;
 
-    private Ontwikkelaar[] ontwikkelaars;
-    private Gebruiker[] gebruikers;
+    private static Ontwikkelaar[] ontwikkelaars;
+    private  Gebruiker[] gebruikers;
     public static int ontwikkelaarsInMeeting = 0;
     public static int amtOfUsersArrived = 0;
+    public static Semaphore canWork;
     public static boolean userMeeting;
     public static boolean leiderInOverleg = false;
     public static Semaphore projectLeidersTijd;
@@ -40,6 +42,7 @@ public class OntwikkelBedrijf {
         devInvitation = new Semaphore(0, true);
         increaseUsersArrived = new Semaphore(1,true);
         projectLeidersTijd = new Semaphore(1,true);
+        canWork = new Semaphore(0,true);
 
 
         readyForMeeting = new Semaphore(0, true);
@@ -65,5 +68,11 @@ public class OntwikkelBedrijf {
     public static long getRandomTime(){
         return (long) (Math.random() * 20000);
     }
+    public static long getRandomTime(long time){
+        return (long) (Math.random() * time);
+    }
 
+    public static Ontwikkelaar[] getOntwikkelaars() {
+        return ontwikkelaars;
+    }
 }
