@@ -18,31 +18,35 @@ public class ProjectLeider extends Thread {
 
     public void nap(){
             try{
+
                 System.out.println("snoozing ...");
                 Thread.sleep(10000);
             } catch (InterruptedException ie){
                 System.out.println("main thread interupted, leader woken up, checking the situation:");
 
-                if (OntwikkelBedrijf.probleem.tryAcquire()) {
-                    try {
-                        OntwikkelBedrijf.probleem.acquire();
-                        OntwikkelBedrijf.meetingInvitation.release();
-                        OntwikkelBedrijf.arrivedAtCompany.acquire();
-                        if (OntwikkelBedrijf.ontwikkelaarsInMeeting > 0) {
-                            OntwikkelBedrijf.devInvitation.release();
+                if (OntwikkelBedrijf.arrivedAtCompany.tryAcquire()){
+                    try{
+                        if (OntwikkelBedrijf.ontwikkelaarsInMeeting < 1){
+                            OntwikkelBedrijf.readyForUserMeeting.acquire();
                         }
-                        else{
-                            OntwikkelBedrijf.devInvitation.release(3);
-                            haveMeeting();
-                        }
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        OntwikkelBedrijf.devInvitation.release();
+                        OntwikkelBedrijf.meetingInvitation.release(OntwikkelBedrijf.amtOfUsersArrived);
+                        haveMeeting();
+                    }   catch (InterruptedException i){
+                        i.printStackTrace();
                     }
-                }   else if (OntwikkelBedrijf.ontwikkelaarsInMeeting == 3){
+                } else if (OntwikkelBedrijf.probleem.tryAcquire()) {
+                        System.out.println("user has a bug, sending an invite & going back to sleep until he has arrived zzz..");
+                        OntwikkelBedrijf.meetingInvitation.release();
+
+                } else {
                     System.out.println("devs are ready, sending 3 invites");
                     OntwikkelBedrijf.devInvitation.release(3);
                     haveMeeting();
+
                 }
+                OntwikkelBedrijf.projectLeidersTijd.release();
+                System.out.println("projectleiders tijd released");
 
             }
         }
@@ -51,6 +55,7 @@ public class ProjectLeider extends Thread {
     private void haveMeeting(){
         try {
             OntwikkelBedrijf.leiderInOverleg = true;
+            System.out.println("initializing meeting");
             Thread.sleep(10000);
             System.out.println("meeting finished succesfully");
             OntwikkelBedrijf.leiderInOverleg = false;

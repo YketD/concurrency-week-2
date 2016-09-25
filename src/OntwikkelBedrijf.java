@@ -7,19 +7,23 @@ import java.util.concurrent.Semaphore;
 public class OntwikkelBedrijf {
     private static int NUMBER_OF_ONTWIKKELAARS = 6;
     private static int NUMBER_OF_GEBRUIKERS = 10;
+
     public static Semaphore readyForMeeting;
     public static Semaphore probleem;
     public static Semaphore meetingInvitation;
     public static Semaphore arrivedAtCompany;
     public static Semaphore readyForUserMeeting;
     public static Semaphore increaseDevsWaiting;
-    public static Semaphore meeting;
+    public static Semaphore increaseUsersArrived;
     public static Semaphore devInvitation;
+
     private Ontwikkelaar[] ontwikkelaars;
     private Gebruiker[] gebruikers;
     public static int ontwikkelaarsInMeeting = 0;
+    public static int amtOfUsersArrived = 0;
     public static boolean userMeeting;
     public static boolean leiderInOverleg = false;
+    public static Semaphore projectLeidersTijd;
     public static int amtInMeeting;
 
     static ProjectLeider projectLeider = new ProjectLeider("jaap");
@@ -34,6 +38,8 @@ public class OntwikkelBedrijf {
         arrivedAtCompany = new Semaphore(0,true);
         readyForUserMeeting = new Semaphore(1, true);
         devInvitation = new Semaphore(0, true);
+        increaseUsersArrived = new Semaphore(1,true);
+        projectLeidersTijd = new Semaphore(1,true);
 
 
         readyForMeeting = new Semaphore(0, true);
@@ -55,6 +61,9 @@ public class OntwikkelBedrijf {
 
 
         projectLeider.start();
+    }
+    public static long getRandomTime(){
+        return (long) (Math.random() * 20000);
     }
 
 }

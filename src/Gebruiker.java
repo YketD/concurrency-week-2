@@ -6,10 +6,10 @@ public class Gebruiker extends Thread {
     public void run(){
         while(true) {
             gebruiken();
-//            meldProbleem();
-//            getInvitation();
-//            driveToCompany();
-//            startMeeting();
+            meldProbleem();
+            getInvitation();
+            driveToCompany();
+            waitForMeeting();
 
         }
     }
@@ -17,15 +17,19 @@ public class Gebruiker extends Thread {
     private void gebruiken() {
         try {
             System.out.println("gebruiker gebruikt app..");
-
-            Thread.sleep(100000);
+            Thread.sleep(OntwikkelBedrijf.getRandomTime());
         } catch (InterruptedException ie) {
         }
     }
 
     public void meldProbleem(){
+        System.out.println("bug! notifying projectleider");
+        try {
+            OntwikkelBedrijf.projectLeidersTijd.acquire();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }OntwikkelBedrijf.probleem.release();
         OntwikkelBedrijf.projectLeider.interrupt();
-        OntwikkelBedrijf.probleem.release();
     }
 
     public void getInvitation(){
@@ -37,18 +41,25 @@ public class Gebruiker extends Thread {
 
     public void driveToCompany(){
         try {
-            Thread.sleep(10000);
+            System.out.println("driving to company..");
+            Thread.sleep(1000);
+            System.out.println("im here!");
+            OntwikkelBedrijf.increaseUsersArrived.acquire();
+            OntwikkelBedrijf.amtOfUsersArrived +=1;
+            OntwikkelBedrijf.increaseUsersArrived.release();
             OntwikkelBedrijf.arrivedAtCompany.release();
+            OntwikkelBedrijf.projectLeidersTijd.acquire();
+            OntwikkelBedrijf.projectLeider.interrupt();
+
         } catch (InterruptedException ie){
 
         }
     }
 
-    public void startMeeting(){
+    public void waitForMeeting(){
         try {
-            System.out.println("user getting into meeting");
-            OntwikkelBedrijf.readyForUserMeeting.acquire();
-            System.out.println("user in meeting");
+            OntwikkelBedrijf.meetingInvitation.acquire();
+            haveMeeting();
         } catch (InterruptedException ie){}
     }
 

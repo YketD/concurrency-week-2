@@ -17,36 +17,36 @@ public class Ontwikkelaar extends Thread {
 
     private void work() {
         try {
-            Thread.sleep(workTime);
+            Thread.sleep(OntwikkelBedrijf.getRandomTime());
         } catch (InterruptedException ie) {
         }
 
     }
 
     private void meldBeschikbaar() {
-        System.out.println("proberen beschikbaar te melden");
+
+//        System.out.println("proberen beschikbaar te melden");
         try {
             OntwikkelBedrijf.increaseDevsWaiting.acquire();
             if (!OntwikkelBedrijf.leiderInOverleg && OntwikkelBedrijf.ontwikkelaarsInMeeting != 3) {
-
                 OntwikkelBedrijf.ontwikkelaarsInMeeting += 1;
 
                 System.out.println("ik ben de " + OntwikkelBedrijf.ontwikkelaarsInMeeting + "'e persoon in de wachtrij");
+                if (!OntwikkelBedrijf.leiderInOverleg) {
+                    if (OntwikkelBedrijf.ontwikkelaarsInMeeting == 3) {
+                        System.out.println("enough devs are in to start the meeting, trying to wake up projectleider");
+                        OntwikkelBedrijf.projectLeidersTijd.acquire();
+                        OntwikkelBedrijf.projectLeider.interrupt();
+                    }
 
-                if (OntwikkelBedrijf.ontwikkelaarsInMeeting == 3) {
-                    System.out.println("enough devs are in to start the meeting, projectleider is being woken up");
-                    OntwikkelBedrijf.projectLeider.interrupt();
+                    OntwikkelBedrijf.increaseDevsWaiting.release();
+                    OntwikkelBedrijf.devInvitation.acquire();
+                    System.out.println("invite acquired, meeting starts..");
+                    haveMeeting();
                 }
-                OntwikkelBedrijf.increaseDevsWaiting.release();
-                OntwikkelBedrijf.devInvitation.acquire();
-                System.out.println("invite acquired, meeting starts..");
-                haveMeeting();
-
-            }else{
+            } else {
                 OntwikkelBedrijf.increaseDevsWaiting.release();
             }
-
-
         } catch (InterruptedException ie) {
             ie.printStackTrace();
         }
@@ -54,12 +54,9 @@ public class Ontwikkelaar extends Thread {
     }
 
 
-
-
-    private void haveMeeting(){
+    private void haveMeeting() {
         try {
             Thread.sleep(10000);
-            System.out.println("meeting finished succesfully");
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
