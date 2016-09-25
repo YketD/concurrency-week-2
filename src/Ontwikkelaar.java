@@ -30,20 +30,13 @@ public class Ontwikkelaar extends Thread {
             OntwikkelBedrijf.increaseDevsWaiting.acquire();
             if (!OntwikkelBedrijf.leiderInOverleg && OntwikkelBedrijf.ontwikkelaarsInMeeting != 3) {
                 OntwikkelBedrijf.ontwikkelaarsInMeeting += 1;
-
                 System.out.println("ik ben de " + OntwikkelBedrijf.ontwikkelaarsInMeeting + "'e persoon in de wachtrij");
-                if (!OntwikkelBedrijf.leiderInOverleg) {
-                    if (OntwikkelBedrijf.ontwikkelaarsInMeeting == 3) {
-                        System.out.println("enough devs are in to start the meeting, trying to wake up projectleider");
-                        OntwikkelBedrijf.projectLeidersTijd.acquire();
-                        OntwikkelBedrijf.projectLeider.interrupt();
-                    }
-
-                    OntwikkelBedrijf.increaseDevsWaiting.release();
-                    OntwikkelBedrijf.devInvitation.acquire();
+                OntwikkelBedrijf.devMeeting.countDown();
+                OntwikkelBedrijf.increaseDevsWaiting.release();
+                OntwikkelBedrijf.devInvitation.acquire();
                     System.out.println("invite acquired, meeting starts..");
                     haveMeeting();
-                }
+
             } else {
                 OntwikkelBedrijf.increaseDevsWaiting.release();
             }

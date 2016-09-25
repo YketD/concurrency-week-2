@@ -12,16 +12,11 @@ public class ProjectLeider extends Thread {
     }
     public void run(){
         while (true){
-            nap();
-        }
-    }
-
-    public void nap(){
-            try{
-
-                System.out.println("snoozing ...");
-                Thread.sleep(10000);
-            } catch (InterruptedException ie){
+            try {
+                OntwikkelBedrijf.devMeeting.await();
+                OntwikkelBedrijf.devInvitation.release(3);
+                haveMeeting();
+            }   catch (InterruptedException ie){
                 System.out.println("main thread interupted, leader woken up, checking the situation:");
 
                 if (OntwikkelBedrijf.arrivedAtCompany.tryAcquire()){
@@ -36,20 +31,14 @@ public class ProjectLeider extends Thread {
                         i.printStackTrace();
                     }
                 } else if (OntwikkelBedrijf.probleem.tryAcquire()) {
-                        System.out.println("user has a bug, sending an invite & going back to sleep until he has arrived zzz..");
-                        OntwikkelBedrijf.meetingInvitation.release();
-
-                } else {
-                    System.out.println("devs are ready, sending 3 invites");
-                    OntwikkelBedrijf.devInvitation.release(3);
-                    haveMeeting();
-
+                    System.out.println("user has a bug, sending an invite & going back to sleep until he has arrived zzz..");
+                    OntwikkelBedrijf.meetingInvitation.release();
                 }
                 OntwikkelBedrijf.projectLeidersTijd.release();
                 System.out.println("projectleiders tijd released");
-
             }
         }
+    }
 
 
     private void haveMeeting(){
