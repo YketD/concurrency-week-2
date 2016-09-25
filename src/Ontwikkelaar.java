@@ -24,26 +24,29 @@ public class Ontwikkelaar extends Thread {
     }
 
     private void meldBeschikbaar() {
+        System.out.println("proberen beschikbaar te melden");
         try {
-
+            OntwikkelBedrijf.increaseDevsWaiting.acquire();
             if (!OntwikkelBedrijf.leiderInOverleg && OntwikkelBedrijf.ontwikkelaarsInMeeting != 3) {
-                OntwikkelBedrijf.increaseDevsWaiting.acquire();
+
                 OntwikkelBedrijf.ontwikkelaarsInMeeting += 1;
-                OntwikkelBedrijf.increaseDevsWaiting.release();
 
                 System.out.println("ik ben de " + OntwikkelBedrijf.ontwikkelaarsInMeeting + "'e persoon in de wachtrij");
 
                 if (OntwikkelBedrijf.ontwikkelaarsInMeeting == 3) {
                     System.out.println("enough devs are in to start the meeting, projectleider is being woken up");
                     OntwikkelBedrijf.projectLeider.interrupt();
-                    OntwikkelBedrijf.devInvitation.acquire();
-                    System.out.println("invite acquired, meeting starts..");
-                    haveMeeting();
-                }else {
                 }
-                }
+                OntwikkelBedrijf.increaseDevsWaiting.release();
+                OntwikkelBedrijf.devInvitation.acquire();
+                System.out.println("invite acquired, meeting starts..");
+                haveMeeting();
 
-            OntwikkelBedrijf.increaseDevsWaiting.release();
+            }else{
+                OntwikkelBedrijf.increaseDevsWaiting.release();
+            }
+
+
         } catch (InterruptedException ie) {
             ie.printStackTrace();
         }
